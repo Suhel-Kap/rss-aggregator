@@ -1,0 +1,13 @@
+# .air.toml
+
+# Entrypoint file
+[build]
+entrypoint = "main.go"
+
+# File types to watch for changes
+[build.watch]
+extensions = ["go", "mod", "sum"]
+
+# Environment variables to set
+[env]
+PORT = "8000"
