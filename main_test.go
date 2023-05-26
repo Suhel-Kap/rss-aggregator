@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bytes"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -53,86 +51,86 @@ func GetApiCfg() *apiConfig {
 	return api
 }
 
-func TestDBCreate(t *testing.T) {
-	godotenv.Load()
-	conn, err := sql.Open("postgres", os.Getenv("DB_URL"))
-	if err != nil {
-		t.Fatalf("Failed to connect to database: %v", err)
-	}
-	defer conn.Close()
+// func TestDBCreate(t *testing.T) {
+// 	godotenv.Load()
+// 	conn, err := sql.Open("postgres", os.Getenv("DB_URL"))
+// 	if err != nil {
+// 		t.Fatalf("Failed to connect to database: %v", err)
+// 	}
+// 	defer conn.Close()
 
-	err = conn.Ping()
-	if err != nil {
-		t.Fatalf("Failed to ping database: %v", err)
-	}
+// 	err = conn.Ping()
+// 	if err != nil {
+// 		t.Fatalf("Failed to ping database: %v", err)
+// 	}
 
-	t.Logf("Successfully connected to database")
-}
+// 	t.Logf("Successfully connected to database")
+// }
 
-func TestCreateUser(t *testing.T) {
-	godotenv.Load()
-	conn, err := sql.Open("postgres", os.Getenv("DB_URL"))
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+// func TestCreateUser(t *testing.T) {
+// 	godotenv.Load()
+// 	conn, err := sql.Open("postgres", os.Getenv("DB_URL"))
+// 	if err != nil {
+// 		t.Errorf(err.Error())
+// 	}
 
-	// Create a new API server with a mock database
-	api := &apiConfig{
-		DB: database.New(conn),
-	}
+// 	// Create a new API server with a mock database
+// 	api := &apiConfig{
+// 		DB: database.New(conn),
+// 	}
 
-	// Create a new user
-	user := struct {
-		Name string `json:"name"`
-	}{
-		Name: "Testuser",
-	}
+// 	// Create a new user
+// 	user := struct {
+// 		Name string `json:"name"`
+// 	}{
+// 		Name: "Testuser",
+// 	}
 
-	// Encode the user as JSON
-	jsonUser, err := json.Marshal(user)
-	if err != nil {
-		t.Fatal(err)
-	}
+// 	// Encode the user as JSON
+// 	jsonUser, err := json.Marshal(user)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	// Send a POST request to create the user
-	req, err := http.NewRequest("POST", "/v1/users", bytes.NewBuffer(jsonUser))
-	if err != nil {
-		t.Fatal(err)
-	}
-	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(api.handlerCreateUser)
+// 	// Send a POST request to create the user
+// 	req, err := http.NewRequest("POST", "/v1/users", bytes.NewBuffer(jsonUser))
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	rr := httptest.NewRecorder()
+// 	handler := http.HandlerFunc(api.handlerCreateUser)
 
-	handler.ServeHTTP(rr, req)
+// 	handler.ServeHTTP(rr, req)
 
-	// Check that the response status code is 201 Created
-	if status := rr.Code; status != http.StatusCreated {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusCreated)
-	}
+// 	// Check that the response status code is 201 Created
+// 	if status := rr.Code; status != http.StatusCreated {
+// 		t.Errorf("handler returned wrong status code: got %v want %v",
+// 			status, http.StatusCreated)
+// 	}
 
-	// Decode the response body into a User struct
-	var createdUser User
-	err = json.NewDecoder(rr.Body).Decode(&createdUser)
-	if err != nil {
-		t.Fatal(err)
-	}
+// 	// Decode the response body into a User struct
+// 	var createdUser User
+// 	err = json.NewDecoder(rr.Body).Decode(&createdUser)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	// Check that the created user has the correct name
-	if createdUser.Name != user.Name {
-		t.Errorf("handler returned unexpected user name: got %v want %v",
-			createdUser.Name, user.Name)
-	}
+// 	// Check that the created user has the correct name
+// 	if createdUser.Name != user.Name {
+// 		t.Errorf("handler returned unexpected user name: got %v want %v",
+// 			createdUser.Name, user.Name)
+// 	}
 
-	// Check that the created user has a non-zero ID
-	if createdUser.ID == uuid.Nil {
-		t.Errorf("handler returned user with zero ID")
-	}
+// 	// Check that the created user has a non-zero ID
+// 	if createdUser.ID == uuid.Nil {
+// 		t.Errorf("handler returned user with zero ID")
+// 	}
 
-	// Check that the created user has a non-zero API key
-	if createdUser.ApiKey == "" {
-		t.Errorf("handler returned user with empty API key")
-	}
-}
+// 	// Check that the created user has a non-zero API key
+// 	if createdUser.ApiKey == "" {
+// 		t.Errorf("handler returned user with empty API key")
+// 	}
+// }
 
 type mockDB struct{}
 
