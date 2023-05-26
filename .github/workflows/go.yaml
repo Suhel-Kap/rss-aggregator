@@ -10,6 +10,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: rssagg
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -26,4 +41,10 @@ jobs:
       run: go build -v ./...
 
     - name: Test
+      env:
+        POSTGRES_HOST: postgres
+        POSTGRES_PORT: 5432
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: rssagg
       run: go test -v ./...
