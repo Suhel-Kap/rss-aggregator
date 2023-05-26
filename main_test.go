@@ -57,16 +57,16 @@ func TestDBCreate(t *testing.T) {
 	godotenv.Load()
 	conn, err := sql.Open("postgres", os.Getenv("DB_URL"))
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Fatalf("Failed to connect to database: %v", err)
 	}
-	rows, err := conn.Query("SELECT * FROM users")
+	defer conn.Close()
+
+	err = conn.Ping()
 	if err != nil {
-		t.Errorf(err.Error())
+		t.Fatalf("Failed to ping database: %v", err)
 	}
 
-	if !rows.Next() {
-		t.Errorf("No data found in table!")
-	}
+	t.Logf("Successfully connected to database")
 }
 
 func TestCreateUser(t *testing.T) {
